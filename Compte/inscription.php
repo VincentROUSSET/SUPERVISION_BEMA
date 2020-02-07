@@ -8,6 +8,60 @@
 	var_dump($donneesDroitAcces);
 	var_dump($donneesGroupe)
 	
+	if (isset($_POST['forminscription'])) 
+{
+	$nom = htmlspecialchars($_POST['nom']);
+	$prenom = htmlspecialchars($_POST['prenom']);
+	$email = htmlspecialchars($_POST['email']);
+	$email2 = htmlspecialchars($_POST['email2']);
+	$mdp = sha1($_POST['mdp']);
+	$mdp2 = sha1($_POST['mdp2']);
+	if(!empty($_POST['nom']) AND !empty($_POST['prenom']) AND !empty($_POST['email']) AND !empty($_POST['email2']) AND !empty($_POST['mdp']) AND !empty($_POST['mdp2']))
+	{
+		
+		$nom_length = strlen($nom);
+			if($email == $email2)
+			{
+					
+				if(filter_var($email, FILTER_VALIDATE_EMAIL))
+				{
+					$reqmail = $bdd->prepare("SELECT * FROM utilisateur WHERE email = ?");
+					$reqmail->execute(array($email));
+					$mailexist = $reqmail->rowCount();
+					if($mailexist == 0)
+					{
+						if($mdp == $mdp2)
+						{
+							$insertuser = $bdd->prepare("INSERT INTO utilisateur(nom, prenom, email) VALUES (?, ?, ?)");
+							$insertuser->execute(array($nom, $prenom, $email));
+							$erreur = "Votre compte à bien été créer ! <a href=\"connexion.php\">Me connecter</a>";	
+						}
+						else
+						{
+						 	$erreur = "Vos mots de passes ne correspondent pas !";
+						}
+					}
+					else
+					{
+						$erreur = "Adresse mail déjà utilisée !";
+					}
+				}
+				else
+				{
+					$erreur = "Vos adresses mail ne correspondent pas !";
+				}
+
+			}
+			else
+			{
+				$erreur = "Votre adresse mail n'est pas valide !";
+			}
+		}
+	}
+	else
+	{
+		$erreur = "Tous les champs ne sont pas complétés !";
+	}
 	
 	
 ?>
